@@ -1,4 +1,4 @@
-
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -586,109 +586,30 @@
             </div>
         </div>
     </section>
-```html
-<!-- Contracts Section -->
-<section class="section" id="contracts">
-    <div class="container">
-        <div class="section-header">
-            <h2>Available Contracts</h2>
-            <p>Browse and submit bids for government infrastructure projects</p>
-        </div>
-        
-        <div id="contracts-container" class="features-grid">
-            <!-- Loading message -->
-            <div class="feature-card" style="text-align: center; padding: 40px;">
-                <div class="feature-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                    <i class="fas fa-spinner fa-spin"></i>
-                </div>
-                <h3>Loading Contracts...</h3>
-                <p>Please wait while we fetch available opportunities</p>
-            </div>
-        </div>
-        
-        <div id="bid-result" style="margin-top: 30px; text-align: center;"></div>
-    </div>
-</section>
 
-<script>
-// Your Render backend URL - REPLACE THIS WITH YOUR ACTUAL RENDER URL!
-const BACKEND_URL = "https://contract-bidding-app.onrender.com";
-
-// Load contracts from backend
-async function loadContracts() {
-    try {
-        const response = await fetch(`${BACKEND_URL}/contracts`);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const html = await response.text();
-        document.getElementById('contracts-container').innerHTML = html;
-    } catch (error) {
-        console.error("Failed to load contracts:", error);
-        document.getElementById('contracts-container').innerHTML = `
-            <div class="feature-card" style="text-align: center; padding: 40px; background: #fee;">
-                <div class="feature-icon" style="background: #ef4444;">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-                <h3>Error Loading Contracts</h3>
-                <p>${error.message}</p>
-                <button onclick="loadContracts()" class="btn btn-primary" style="margin-top: 15px;">
-                    <i class="fas fa-redo"></i> Retry
-                </button>
-            </div>
-        `;
-    }
-}
-
-// Handle bid submission
-async function submitBid(contractId, event) {
-    event.preventDefault();
-    const form = event.target;
-    const formData = new FormData(form);
-    
-    try {
-        const response = await fetch(`${BACKEND_URL}/contracts/${contractId}/submit_bid`, {
-            method: 'POST',
-            body: formData
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const result = await response.text();
-        document.getElementById('bid-result').innerHTML = `
-            <div class="feature-card" style="background: #f0fdf4; border-color: #bbf7d0;">
-                <div class="feature-icon" style="background: #10b981;">
-                    <i class="fas fa-check"></i>
-                </div>
-                ${result}
-            </div>
-        `;
-        
-        // Reset form
-        form.reset();
-        
-    } catch (error) {
-        console.error("Bid submission failed:", error);
-        document.getElementById('bid-result').innerHTML = `
-            <div class="feature-card" style="background: #fef2f2; border-color: #fecaca;">
-                <div class="feature-icon" style="background: #ef4444;">
-                    <i class="fas fa-times"></i>
-                </div>
-                <h3>Bid Submission Failed</h3>
-                <p>${error.message}</p>
-            </div>
-        `;
-    }
-}
-
-// Initialize when page loads
-document.addEventListener('DOMContentLoaded', loadContracts);
-</script>
-
-    <section class="section" id="features">
+    <!-- Contracts Section -->
+    <section class="section" id="contracts">
         <div class="container">
+            <div class="section-header">
+                <h2>Available Contracts</h2>
+                <p>Browse and submit bids for government infrastructure projects</p>
+            </div>
+            
+            <div id="contracts-container" class="features-grid">
+                <!-- Loading message -->
+                <div class="feature-card" style="text-align: center; padding: 40px;">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                    <h3>Loading Contracts...</h3>
+                    <p>Please wait while we fetch available opportunities</p>
+                </div>
+            </div>
+            
+            <div id="bid-result" style="margin-top: 30px; text-align: center;"></div>
+        </div>
+    </section>
+
     <section class="section" id="dashboard">
         <div class="container">
             <div class="section-header">
@@ -830,6 +751,80 @@ document.addEventListener('DOMContentLoaded', loadContracts);
     </footer>
 
     <script>
+        // REPLACE WITH YOUR ACTUAL RENDER BACKEND URL (NO TRAILING SPACES!)
+        const BACKEND_URL = "https://contract-bidding-app.onrender.com";
+
+        // Load contracts from backend
+        async function loadContracts() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/contracts`);
+                if (!response.ok) {
+                    throw new Error(`Failed to load contracts: ${response.status}`);
+                }
+                const html = await response.text();
+                document.getElementById('contracts-container').innerHTML = html;
+            } catch (error) {
+                console.error("Failed to load contracts:", error);
+                document.getElementById('contracts-container').innerHTML = `
+                    <div class="feature-card" style="text-align: center; padding: 40px; background: #fee;">
+                        <div class="feature-icon" style="background: #ef4444;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h3>Error Loading Contracts</h3>
+                        <p>${error.message}</p>
+                        <button onclick="loadContracts()" class="btn btn-primary" style="margin-top: 15px;">
+                            <i class="fas fa-redo"></i> Retry
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Handle bid submission
+        async function submitBid(contractId, event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/contracts/${contractId}/submit_bid`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText || `Submission failed: ${response.status}`);
+                }
+                
+                const result = await response.text();
+                document.getElementById('bid-result').innerHTML = `
+                    <div class="feature-card" style="background: #f0fdf4; border-color: #bbf7d0;">
+                        <div class="feature-icon" style="background: #10b981;">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        ${result}
+                    </div>
+                `;
+                
+                // Reset form after successful submission
+                form.reset();
+                
+            } catch (error) {
+                console.error("Bid submission failed:", error);
+                document.getElementById('bid-result').innerHTML = `
+                    <div class="feature-card" style="background: #fef2f2; border-color: #fecaca;">
+                        <div class="feature-icon" style="background: #ef4444;">
+                            <i class="fas fa-times"></i>
+                        </div>
+                        <h3>Bid Submission Failed</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Smooth scrolling for navigation links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -839,6 +834,7 @@ document.addEventListener('DOMContentLoaded', loadContracts);
             });
         });
         
+        // Active tab functionality
         const tabs = document.querySelectorAll('.tab');
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
@@ -846,8 +842,10 @@ document.addEventListener('DOMContentLoaded', loadContracts);
                 tab.classList.add('active');
             });
         });
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', loadContracts);
     </script>
 </body>
 </html>
-
 ```
