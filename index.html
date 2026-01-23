@@ -1,11 +1,21 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AISEC - AI for Secure and Efficient Contracting</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Font Awesome with automatic trailing space removal -->
+    <script>
+        // Automatically fix CDN URLs by removing trailing spaces
+        document.addEventListener('DOMContentLoaded', function() {
+            const fontAwesomeUrl = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css  ";
+            const cleanUrl = fontAwesomeUrl.trim();
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = cleanUrl;
+            document.head.appendChild(link);
+        });
+    </script>
     <style>
         :root {
             --primary: #2563eb;
@@ -751,8 +761,9 @@
     </footer>
 
     <script>
-        // REPLACE WITH YOUR ACTUAL RENDER BACKEND URL
-        const BACKEND_URL = "https://contract-bidding-app.onrender.com";
+        // Backend URL with automatic trailing space removal
+        const BACKEND_URL_RAW = "https://contract-bidding-app.onrender.com  ";
+        const BACKEND_URL = BACKEND_URL_RAW.trim();
 
         // Load contracts from backend
         async function loadContracts() {
@@ -848,4 +859,4 @@
     </script>
 </body>
 </html>
-``
+```
