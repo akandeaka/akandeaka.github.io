@@ -1,21 +1,30 @@
+The issue is that your **AISEC page isn't loading in live production** because of **trailing spaces in your URLs** and **incorrect backend URL configuration**.
+
+## 🔍 **Root Cause Analysis:**
+
+Looking at your code, you have **trailing spaces in multiple critical URLs**:
+
+1. **Font Awesome CDN**: `"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css  "`
+2. **Backend URL**: `"https://contract-bidding-app.onrender.com    "`
+
+These trailing spaces cause:
+- **404 errors** when loading resources
+- **Failed API calls** to your backend
+- **Blank/empty page** because contracts can't be fetched
+
+## ✅ **Permanent Fix - Clean `index.html`:**
+
+Replace your entire `index.html` with this **production-ready version**:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AISEC - AI for Secure and Efficient Contracting</title>
-    <!-- Font Awesome with automatic trailing space removal -->
-    <script>
-        // Automatically fix CDN URLs by removing trailing spaces
-        document.addEventListener('DOMContentLoaded', function() {
-            const fontAwesomeUrl = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css  ";
-            const cleanUrl = fontAwesomeUrl.trim();
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = cleanUrl;
-            document.head.appendChild(link);
-        });
-    </script>
+    <!-- Clean Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: #2563eb;
@@ -761,9 +770,8 @@
     </footer>
 
     <script>
-        // Backend URL with automatic trailing space removal
-        const BACKEND_URL_RAW = "https://contract-bidding-app.onrender.com  ";
-        const BACKEND_URL = BACKEND_URL_RAW.trim();
+        // REPLACE WITH YOUR ACTUAL RENDER BACKEND URL (NO TRAILING SPACES!)
+        const BACKEND_URL = "https://contract-bidding-app.onrender.com";
 
         // Load contracts from backend
         async function loadContracts() {
