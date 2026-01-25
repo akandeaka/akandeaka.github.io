@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AISEC - AI for Secure and Efficient Contracting</title>
-    <!-- Clean Font Awesome CDN -->
+    <!-- Clean Font Awesome CDN (NO trailing spaces) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -554,8 +553,8 @@
             </nav>
             
             <div class="auth-buttons">
-                <button class="btn btn-outline">Login</button>
-                <button class="btn btn-primary">Register</button>
+                <button class="btn btn-outline" onclick="window.location.href='https://contract-bidding-app.onrender.com/login'">Login</button>
+                <button class="btn btn-primary" onclick="window.location.href='https://contract-bidding-app.onrender.com/register'">Register</button>
             </div>
         </div>
     </header>
@@ -566,7 +565,7 @@
                 <h1>Transforming Public Procurement with AI</h1>
                 <p>AISEC leverages artificial intelligence to eliminate fraud, inefficiencies, and corruption in Nigeria's contract awarding process.</p>
                 <div class="auth-buttons">
-                    <button class="btn btn-primary">Get Started</button>
+                    <button class="btn btn-primary" onclick="window.location.href='https://contract-bidding-app.onrender.com/register'">Get Started</button>
                     <button class="btn btn-outline">View Demo</button>
                 </div>
                 
@@ -752,13 +751,20 @@
     </footer>
 
     <script>
-        // REPLACE WITH YOUR ACTUAL RENDER BACKEND URL (NO TRAILING SPACES!)
+        // REPLACE WITH YOUR ACTUAL RENDER BACKEND URL (NO trailing spaces!)
         const BACKEND_URL = "https://contract-bidding-app.onrender.com";
 
         // Load contracts from backend
         async function loadContracts() {
             try {
-                const response = await fetch(`${BACKEND_URL}/contracts`);
+                const response = await fetch(`${BACKEND_URL}/contracts`, {
+                    credentials: 'include' // Important for cookies
+                });
+                if (response.status === 303) {
+                    // Redirect to login
+                    window.location.href = `${BACKEND_URL}/login`;
+                    return;
+                }
                 if (!response.ok) {
                     throw new Error(`Failed to load contracts: ${response.status}`);
                 }
@@ -766,18 +772,22 @@
                 document.getElementById('contracts-container').innerHTML = html;
             } catch (error) {
                 console.error("Failed to load contracts:", error);
-                document.getElementById('contracts-container').innerHTML = `
-                    <div class="feature-card" style="text-align: center; padding: 40px; background: #fee;">
-                        <div class="feature-icon" style="background: #ef4444;">
-                            <i class="fas fa-exclamation-triangle"></i>
+                if (error.message.includes('401')) {
+                    window.location.href = `${BACKEND_URL}/login`;
+                } else {
+                    document.getElementById('contracts-container').innerHTML = `
+                        <div class="feature-card" style="text-align: center; padding: 40px; background: #fee;">
+                            <div class="feature-icon" style="background: #ef4444;">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <h3>Error Loading Contracts</h3>
+                            <p>${error.message}</p>
+                            <button onclick="loadContracts()" class="btn btn-primary" style="margin-top: 15px;">
+                                <i class="fas fa-redo"></i> Retry
+                            </button>
                         </div>
-                        <h3>Error Loading Contracts</h3>
-                        <p>${error.message}</p>
-                        <button onclick="loadContracts()" class="btn btn-primary" style="margin-top: 15px;">
-                            <i class="fas fa-redo"></i> Retry
-                        </button>
-                    </div>
-                `;
+                    `;
+                }
             }
         }
 
@@ -790,8 +800,14 @@
             try {
                 const response = await fetch(`${BACKEND_URL}/contracts/${contractId}/submit_bid`, {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    credentials: 'include'
                 });
+                
+                if (response.status === 303) {
+                    window.location.href = `${BACKEND_URL}/login`;
+                    return;
+                }
                 
                 if (!response.ok) {
                     const errorText = await response.text();
@@ -813,15 +829,19 @@
                 
             } catch (error) {
                 console.error("Bid submission failed:", error);
-                document.getElementById('bid-result').innerHTML = `
-                    <div class="feature-card" style="background: #fef2f2; border-color: #fecaca;">
-                        <div class="feature-icon" style="background: #ef4444;">
-                            <i class="fas fa-times"></i>
+                if (error.message.includes('401')) {
+                    window.location.href = `${BACKEND_URL}/login`;
+                } else {
+                    document.getElementById('bid-result').innerHTML = `
+                        <div class="feature-card" style="background: #fef2f2; border-color: #fecaca;">
+                            <div class="feature-icon" style="background: #ef4444;">
+                                <i class="fas fa-times"></i>
+                            </div>
+                            <h3>Bid Submission Failed</h3>
+                            <p>${error.message}</p>
                         </div>
-                        <h3>Bid Submission Failed</h3>
-                        <p>${error.message}</p>
-                    </div>
-                `;
+                    `;
+                }
             }
         }
 
