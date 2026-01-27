@@ -751,17 +751,16 @@
     </footer>
 
     <script>
-        // REPLACE WITH YOUR ACTUAL RENDER BACKEND URL (NO trailing spaces!)
+        // Clean backend URL (NO trailing spaces!)
         const BACKEND_URL = "https://contract-bidding-app.onrender.com";
 
         // Load contracts from backend
         async function loadContracts() {
             try {
                 const response = await fetch(`${BACKEND_URL}/contracts`, {
-                    credentials: 'include' // Important for cookies
+                    credentials: 'include'
                 });
                 if (response.status === 303) {
-                    // Redirect to login
                     window.location.href = `${BACKEND_URL}/login`;
                     return;
                 }
@@ -824,7 +823,6 @@
                     </div>
                 `;
                 
-                // Reset form after successful submission
                 form.reset();
                 
             } catch (error) {
