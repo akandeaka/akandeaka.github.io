@@ -756,40 +756,37 @@
         const BACKEND_URL = "https://contract-bidding-app.onrender.com";
 
         // Load contracts from backend
-        async function loadContracts() {
-            try {
-                const response = await fetch(`${BACKEND_URL}/contracts`, {
-                    credentials: 'include'
-                });
-                if (response.status === 303) {
-                    window.location.href = `${BACKEND_URL}/login`;
-                    return;
-                }
-                if (!response.ok) {
-                    throw new Error(`Failed to load contracts: ${response.status}`);
-                }
-                const html = await response.text();
-                document.getElementById('contracts-container').innerHTML = html;
-            } catch (error) {
-                console.error("Failed to load contracts:", error);
-                if (error.message.includes('401')) {
-                    window.location.href = `${BACKEND_URL}/login`;
-                } else {
-                    document.getElementById('contracts-container').innerHTML = `
-                        <div class="feature-card" style="text-align: center; padding: 40px; background: #fee;">
-                            <div class="feature-icon" style="background: #ef4444;">
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </div>
-                            <h3>Error Loading Contracts</h3>
-                            <p>${error.message}</p>
-                            <button onclick="loadContracts()" class="btn btn-primary" style="margin-top: 15px;">
-                                <i class="fas fa-redo"></i> Retry
-                            </button>
-                        </div>
-                    `;
-                }
-            }
-        }
+        @app.get("/register", response_class=HTMLResponse)
+def register_page(request: Request):
+    return templates.TemplateResponse("register.html", {"request": request})
+
+@app.post("/register", response_class=HTMLResponse)
+async def register_user(company_name: str = Form(...), cac_number: str = Form(...), email: str = Form(...), password: str = Form(...)):
+    try:
+        hashed = hashlib.sha256(password.encode()).hexdigest()
+        cursor.execute("INSERT INTO users (company_name, cac_number, email, hashed_password) VALUES (?, ?, ?, ?)", 
+                       (company_name, cac_number, email, hashed))
+        conn.commit()
+        return "<h2 style='color:green;'>✅ Registration successful!</h2><p><a href='/login'>Login here</a></p>"
+    except sqlite3.IntegrityError:
+        return "<h2 style='color:red;'>❌ Email already registered</h2><p><a href='/login'>Login here</a></p>"
+
+@app.get("/login", response_class=HTMLResponse)
+def login_page(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+@app.post("/login", response_class=HTMLResponse)
+async def login_user(response: Response, email: str = Form(...), password: str = Form(...)):
+    hashed = hashlib.sha256(password.encode()).hexdigest()
+    cursor.execute("SELECT id FROM users WHERE email = ? AND hashed_password = ?", (email, hashed))
+    user = cursor.fetchone()
+    if user:
+        session_token = create_session(user[0])
+        resp = RedirectResponse(url="/contracts", status_code=303)
+        resp.set_cookie(key="session_token", value=session_token, httponly=True, max_age=3600)
+        return resp
+    else:
+        return "<h2 style='color:red;'>❌ Invalid credentials</h2><p><a href='/login'>Try again</a></p>"
 
         // Handle bid submission
         async function submitBid(contractId, event) {
@@ -868,4 +865,5 @@
     </script>
 </body>
 </html>
+
 
